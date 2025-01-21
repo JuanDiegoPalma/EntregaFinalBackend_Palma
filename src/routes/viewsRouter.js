@@ -1,5 +1,6 @@
 import {Router} from 'express'
 import { ProductManager } from '../dao/ProductsManager.js'
+import { errores } from '../utilidades.js'
 export const router=Router()
 
 router.get('/products',async (req,res)=>{

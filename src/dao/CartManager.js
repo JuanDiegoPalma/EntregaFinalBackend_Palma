@@ -21,25 +21,63 @@ export class CartManager{
     }
 
     static getCartById = async (cid) => {
-        const carrito = carritos.find(c => c.id === parseInt(cid));
-        return carrito;
+        try {
+            const carritoId = parseInt(cid);
+            if (isNaN(carritoId)) {
+                throw new Error('El ID del carrito no es válido');
+            }
+    
+            const carrito = carritos.find(c => c.id === carritoId);
+            if (!carrito) {
+                throw new Error('Carrito no encontrado');
+            }
+    
+            return carrito;
+        } catch (error) {
+            console.error('Error al obtener el carrito por ID:', error);
+            throw error;
+        }
+    }
+
+    static getCartById = async (cid) => {
+        try {
+            const carritoId = parseInt(cid);
+            if (isNaN(carritoId)) {
+                throw new Error('El ID del carrito no es válido');
+            }
+    
+            const carrito = carritos.find(c => c.id === carritoId);
+            if (!carrito) {
+                throw new Error('Carrito no encontrado');
+            }
+    
+            return carrito;
+        } catch (error) {
+            console.error('Error al obtener el carrito por ID:', error);
+            throw error;
+        }
     }
 
     static addProductToCart = async (cid, pid) => {
-        const carrito = await getCartById(cid); 
-        if (!carrito) return null;
+        try {
+            const carrito = await getCartById(cid);
+            if (!carrito) return null;
     
-        const existingProduct = carrito.products.find(p => p.product === parseInt(pid));
-        if (existingProduct) {
-            existingProduct.quantity += 1;
-        } else {
-            carrito.products.push({ product: parseInt(pid), quantity: 1 });
+            const productId = parseInt(pid);
+            const existingProduct = carrito.products.find(p => p.product === productId);
+            if (existingProduct) {
+                existingProduct.quantity += 1;
+            } else {
+                carrito.products.push({ product: productId, quantity: 1 });
+            }
+    
+            await this.#grabaArchivo(JSON.stringify(carrito, null, 5));
+            return carrito;
+        } catch (error) {
+            console.error('Error al agregar el producto al carrito:', error);
+            throw error;
         }
-
-        return carrito;
     }
-
-
 
         static async #grabaArchivo(datos=""){
             if(typeof datos!="string"){

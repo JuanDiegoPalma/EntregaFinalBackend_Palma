@@ -43,10 +43,10 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async(req, res) => {
 
-    let {title, ...otros}=req.body
-    if(!title){
+    let {code, ...otros}=req.body
+    if(!code){
         res.setHeader('Content-Type','application/json');
-        return res.status(400).json({error:`title es requerido`})
+        return res.status(400).json({error:`code es requerido`})
     }
     try {
 
@@ -56,7 +56,7 @@ router.post("/", async(req, res) => {
             return res.status(400).json({error:`Existe ${title} en DB`})
         }
 
-        let nuevoProduct=await ProductManager.createProduct({title, ...otros})
+        let nuevoProduct=await ProductManager.createProduct({code, ...otros})
 
         res.setHeader('Content-Type', 'application/json');
         return res.status(201).json({ payload: `Se dio de alta con exito!`, nuevoProduct});

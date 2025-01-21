@@ -2,64 +2,59 @@
 [
     {
         "id": 1,
-        "title": "BMX Sunday 20.75tt",
+        "name": "BMX Sunday 20.75tt",
         "decription": "sagdvcgahs",
-        "code": "",
+        "code": "UWRTD",
         "price": 700,
         "status": true,
         "stock": 7,
-        "category": "",
-        "thumbnails": []
+        "category": ""
     },
     {
         "id": 2,
-        "title": "BMX KINK 21 tt",
+        "name": "BMX KINK 21 tt",
         "decription": "sagdvcgahs",
-        "code": "",
+        "code": "VCXHJ",
         "price": 500,
         "status": true,
         "stock": 5,
-        "category": "",
-        "thumbnails": []
+        "category": ""
     },
     {
         "id": 3,
-        "title": "Manubrio BSD",
+        "name": "Manubrio BSD",
         "decription": "sagdvcgahs",
-        "code": "",
+        "code": "MKLGF",
         "price": 50,
         "status": true,
         "stock": 10,
-        "category": "",
-        "thumbnails": []
+        "category": ""
     },
     {
         "id": 4,
-        "title": "Horquilla Odyssey R25",
+        "name": "Horquilla Odyssey R25",
         "decription": "sagdvcgahs",
-        "code": "",
+        "code": "PPTYN",
         "price": 160,
         "status": true,
         "stock": 13,
-        "category": "",
-        "thumbnails": []
+        "category": ""
     },
     {
         "id": 5,
-        "title": "Grips Federal",
+        "name": "Grips Federal",
         "decription": "sagdvcgahs",
-        "code": "",
+        "code": "ERTWR",
         "price": 20,
         "status": true,
         "stock": 20,
-        "category": "",
-        "thumbnails": []
+        "category": ""
     },
     {
         "id": 6,
-        "title": "Horquilla KINK Help Williams",
+        "name": "Horquilla KINK Help Williams",
         "description": "sadfda",
-        "code": "",
+        "code": "ASDFR",
         "price": 150,
         "status": true,
         "stock": 2,
@@ -67,7 +62,7 @@
     },
     {
         "id": 7,
-        "title": "Odyssey Cluth v2",
+        "name": "Odyssey Cluth v2",
         "description": "",
         "code": "HTYRP",
         "price": 110,

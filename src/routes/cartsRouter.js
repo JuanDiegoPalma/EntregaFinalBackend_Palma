@@ -8,14 +8,20 @@ CartManager.setPath("./src/data/carrito.json")
 
 router.post('/:cid/product/:pid', async (req, res) => {
     const { cid, pid } = req.params;
+    const { quantity = 1 } = req.body;  
+
+    if (!cid || !pid) {
+        return res.status(400).json({ message: 'Faltan parámetros cid o pid' });
+    }
+
     try {
-        const updatedCart = await CartManager.addProductToCart(cid, pid); 
+        const updatedCart = await CartManager.addProductToCart(cid, pid, quantity);
 
         if (!updatedCart) {
             return res.status(404).json({ message: 'Carrito no encontrado' });
         }
 
-        res.status(200).json(updatedCart); 
+        res.status(200).json(updatedCart);
     } catch (error) {
         res.status(500).json({ message: 'Error al agregar el producto' });
     }
