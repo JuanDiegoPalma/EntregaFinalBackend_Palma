@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { ProductManager } from "../dao/ProductsManager.js";
+import {ProductManager} from "../dao/ProductosMongoManager.js";
 import { errores } from "../utilidades.js";
+import { isValidObjectId } from "mongoose";
 
 export const router = Router()
 
-ProductManager.setPath("./src/data/products.json")
+
 
 router.get("/", async (req, res) => {
 
@@ -19,44 +20,44 @@ router.get("/", async (req, res) => {
 
 })
 
-router.get("/:id", async (req, res) => {
-    let { id } = req.params
-    id = Number(id)
-    if (isNaN(id)) {
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(400).json({ error: `Proporcione un id numérico` })
-    }
+// router.get("/:id", async (req, res) => {
+//     let { id } = req.params
+//     id = Number(id)
+//     if (isNaN(id)) {
+//         res.setHeader('Content-Type', 'application/json');
+//         return res.status(400).json({ error: `Proporcione un id numérico` })
+//     }
 
-    try {
-        let product = await ProductManager.getProductsById(id)
-        if (!product) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(404).json({ error: `No existe producto con id ${id}` })
-        }
+//     try {
+//         let product = await ProductManager.getProductBy({ id })
+//         if (!product) {
+//             res.setHeader('Content-Type', 'application/json');
+//             return res.status(404).json({ error: `No existe producto con id ${id}` })
+//         }
 
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(200).json({ product });
-    } catch (error) {
-        errores(res, error)
-    }
-})
+//         res.setHeader('Content-Type', 'application/json');
+//         return res.status(200).json({ product });
+//     } catch (error) {
+//         errores(res, error)
+//     }
+// })
 
 router.post("/", async(req, res) => {
 
-    let {code, ...otros}=req.body
-    if(!code){
+    let {code, title, ...otros}=req.body
+    if(!code || !title){
         res.setHeader('Content-Type','application/json');
-        return res.status(400).json({error:`code es requerido`})
+        return res.status(400).json({error:`code y title es requerido`})
     }
     try {
 
-        let existe=await ProductManager.getProductsByTitle(title)
+        let existe=await ProductManager.getProductBy({code})
         if(existe){
             res.setHeader('Content-Type','application/json');
-            return res.status(400).json({error:`Existe ${title} en DB`})
+            return res.status(400).json({error:`Producto repetido con cod ${code}`})
         }
 
-        let nuevoProduct=await ProductManager.createProduct({code, ...otros})
+        let nuevoProduct=await ProductManager.addProduct({code, title, ...otros})
 
         res.setHeader('Content-Type', 'application/json');
         return res.status(201).json({ payload: `Se dio de alta con exito!`, nuevoProduct});
@@ -68,17 +69,16 @@ router.post("/", async(req, res) => {
 })
 
 router.put("/:id", async(req, res) => {
-    let { id } = req.params
-    id = Number(id)
-    if (isNaN(id)) {
+    let {id} = req.params
+    if (!isValidObjectId(id)) {
         res.setHeader('Content-Type', 'application/json');
-        return res.status(400).json({ error: `Proporcione un id numérico` })
+        return res.status(400).json({ error: `Proporcione un id de MongoDB válido` })
     }
 
     let aModificar=req.body
-    if(aModificar.id){
+    if(aModificar.code){
         res.setHeader('Content-Type', 'application/json');
-        return res.status(400).json({error:`No esta permitido modificar id`})
+        return res.status(400).json({error:`No esta permitido modificar el code`})
     }
     try {
         if(aModificar.title){
@@ -86,43 +86,38 @@ router.put("/:id", async(req, res) => {
             let existe=products.find(p=>p.title.toLowerCase()===aModificar.title.trim().toLowerCase() && p.id!=id)
             if(existe){
                 res.setHeader('Content-Type','application/json');
-                return res.status(400).json({error:`Ya existe un producto con title ${aModificar.title} en DB. Tiene id ${existe.id}`})
+                return res.status(400).json({error:`Ya existe un producto con title ${aModificar.title} en DB.`})
             }
         }
         
-        let productoModificado=await ProductManager.modificaProducto(id, aModificar)
+        let productoModificado=await ProductManager.updateProduct(id, aModificar)
         res.setHeader('Content-Type', 'application/json');
-        return res.status(200).json({ payload: `Se modifico el procducto con id ${id}`, productoModificado });
+        return res.status(200).json({ payload: `Se modificó el procducto`, productoModificado });
     } catch (error) {
         errores(res, error)
     }
 
 })
 
-router.delete("/:pid", async(req, res) => {
+router.delete("/:id", async(req, res) => {
+    let {id} = req.params
+    if(!isValidObjectId(id)){
+        res.setHeader('Content-Type','application/json');
+        return res.status(400).json({error:`Ingrese un id de mongodb válido`})
+    }
     let products=await ProductManager.getProducts()
 if(products.length===0){
     res.setHeader('Content-Type','application/json');
     return res.status(400).json({error: `No hay productos a eliminar`})
 }
 try {
-    let {pid}=req.params
-    let id=Number(pid)
-    if(isNaN(id)){
-    res.setHeader('Content-Type','application/json');
-    return res.status(400).json({error: `Indique un id numérico`})
-}
-
-if(id<1 || id>products.length){
-    res.setHeader('Content-Type','application/json');
-    return res.status(400).json({error: `La posicion debe estar entre 1 y ${products.length}`})
-}
-
-let productEliminado=products[id-1]
-products.splice(id-1, 1)
-
-res.setHeader('Content-Type', 'application/json');
-return res.status(200).json({ payload: `Producto eliminado`, productEliminado, products});
+    let productoEliminado=await ProductManager.deleteProduct(id)
+    if(!productoEliminado){
+        res.setHeader('Content-Type','application/json');
+        return res.status(404).json({error:`No existe producto con id ${id}`})
+    }
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(200).json({ payload: `Se eliminó el producto`, productoEliminado });
 
 } catch (error) {
     errores(res, error)

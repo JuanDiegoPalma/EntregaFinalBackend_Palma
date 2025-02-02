@@ -1,0 +1,27 @@
+<h2>Listado de productos</h2>
+<hr>
+
+<ul>
+    {{#each products}}
+        <li>
+            Producto: {{title}} - Precio: $ <strong>{{price}}</strong>
+        </li>
+    {{/each}}
+</ul>
+<br>
+
+<a href="/products?page=1">Pág.1</a>
+
+{{#if hasPrevPage}}
+    <a href="/products?page={{prevPage}}">Pág.Ant.</a>
+{{else}}
+    <a href="/products?page={{prevPage}}" class="disabled">Pág.Ant.</a>
+{{/if}}
+
+{{#if hasNextPage}}
+    <a href="/products?page={{nextPage}}">Pág.Sig.</a>
+{{else}}
+    <a href="/products?page={{nextPage}}" class="disabled">Pág.Sig.</a>
+{{/if}}
+
+<a href="/products?page={{totalPages}}">Ult.Pág</a>
