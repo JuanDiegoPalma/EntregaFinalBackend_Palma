@@ -8,9 +8,10 @@ export const router = Router()
 
 
 router.get("/", async (req, res) => {
+    const { limit, sort, page, filter}=req.query
 
     try {
-        let products = await ProductManager.getProducts()
+        let products = await ProductManager.getProducts({ limit, sort, page, filter})
 
         res.setHeader('Content-Type', 'application/json');
         return res.status(200).json({ products });
@@ -19,28 +20,6 @@ router.get("/", async (req, res) => {
     }
 
 })
-
-// router.get("/:id", async (req, res) => {
-//     let { id } = req.params
-//     id = Number(id)
-//     if (isNaN(id)) {
-//         res.setHeader('Content-Type', 'application/json');
-//         return res.status(400).json({ error: `Proporcione un id numérico` })
-//     }
-
-//     try {
-//         let product = await ProductManager.getProductBy({ id })
-//         if (!product) {
-//             res.setHeader('Content-Type', 'application/json');
-//             return res.status(404).json({ error: `No existe producto con id ${id}` })
-//         }
-
-//         res.setHeader('Content-Type', 'application/json');
-//         return res.status(200).json({ product });
-//     } catch (error) {
-//         errores(res, error)
-//     }
-// })
 
 router.post("/", async(req, res) => {
 
@@ -68,36 +47,39 @@ router.post("/", async(req, res) => {
 
 })
 
-router.put("/:id", async(req, res) => {
-    let {id} = req.params
+router.put("/:id", async (req, res) => {
+    let { id } = req.params;
     if (!isValidObjectId(id)) {
         res.setHeader('Content-Type', 'application/json');
-        return res.status(400).json({ error: `Proporcione un id de MongoDB válido` })
+        return res.status(400).json({ error: `Proporcione un id de MongoDB válido` });
     }
 
-    let aModificar=req.body
-    if(aModificar.code){
+    let aModificar = req.body;
+    if (aModificar.code) {
         res.setHeader('Content-Type', 'application/json');
-        return res.status(400).json({error:`No esta permitido modificar el code`})
+        return res.status(400).json({ error: 'No está permitido modificar el code' });
     }
+
     try {
-        if(aModificar.title){
-            let products=await ProductManager.getProducts()
-            let existe=products.find(p=>p.title.toLowerCase()===aModificar.title.trim().toLowerCase() && p.id!=id)
-            if(existe){
-                res.setHeader('Content-Type','application/json');
-                return res.status(400).json({error:`Ya existe un producto con title ${aModificar.title} en DB.`})
+        if (aModificar.title) {
+            let products = await ProductManager.getProducts();
+            let existe = products.docs.find(p => p.title.toLowerCase() === aModificar.title.trim().toLowerCase() && p._id != id);
+            if (existe) {
+                res.setHeader('Content-Type', 'application/json');
+                return res.status(400).json({ error: `Ya existe un producto con title ${aModificar.title} en DB.` });
             }
         }
-        
-        let productoModificado=await ProductManager.updateProduct(id, aModificar)
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(200).json({ payload: `Se modificó el procducto`, productoModificado });
-    } catch (error) {
-        errores(res, error)
-    }
 
-})
+        let productoModificado = await ProductManager.updateProduct(id, aModificar);
+        if (!productoModificado) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(200).json({ message: 'Se modificó el producto', productoModificado });
+    } catch (error) {
+        errores(res, error);
+    }
+});
 
 router.delete("/:id", async(req, res) => {
     let {id} = req.params

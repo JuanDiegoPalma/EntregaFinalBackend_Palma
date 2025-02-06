@@ -15,7 +15,7 @@ const productosSchema = new mongoose.Schema(
         status: Boolean,
         stock: Number,
         category: String,
-        images: {
+        thumbnails: {
             type: Array,
             default: []
         }

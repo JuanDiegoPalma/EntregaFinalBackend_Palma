@@ -4,7 +4,10 @@
 <ul>
     {{#each products}}
         <li>
-            Producto: {{title}} - Precio: $ <strong>{{price}}</strong>
+            {{!-- Producto: {{title}} - Precio: $ <strong>{{price}}</strong> --}}
+            <a href="/products/{{this._id}}">{{this.title}}</a> - Precio: $ <strong>{{this.price}}</strong>
+                <button type="submit">Agregar al carrito</button>
+            </form>
         </li>
     {{/each}}
 </ul>

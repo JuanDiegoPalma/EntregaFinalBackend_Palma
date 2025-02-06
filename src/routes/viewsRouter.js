@@ -5,13 +5,20 @@ export const router=Router()
 
 router.get('/products',async (req,res)=>{
 
-    let {page}=req.query
+    let {page, limit, sort}=req.query
     if(!page){
         page=1
     }
+    if (!limit) {
+        limit = 10;
+    }
+    if (!sort) {
+        sort = 'asc';
+    }
+
 
     try {
-            let {docs: products, totalPages, hasPrevPage, prevPage, hasNextPage, nextPage}=await ProductManager.getProducts(page)
+            let {docs: products, totalPages, hasPrevPage, prevPage, hasNextPage, nextPage}=await ProductManager.getProducts({ page, limit, sort })
 
 
     res.status(200).render(
@@ -29,6 +36,19 @@ router.get('/products',async (req,res)=>{
     }
 
 })
+
+router.get('/products/:pid', async (req, res) => {
+    const { pid } = req.params;
+    try {
+        const product = await ProductManager.getProductBy({ _id: pid });
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+        res.status(200).render("productDetails", product);
+    } catch (error) {
+        errores(res, error);
+    }
+});
 
 router.get('/realtimeproducts', async (req,res)=>{
     try {

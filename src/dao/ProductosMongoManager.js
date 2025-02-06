@@ -2,17 +2,17 @@ import { productsModel } from "./models/productsModel.js"
 
 export class ProductManager {
 
-    static async getProducts(page) {
+    static async getProducts({ limit = 10, sort = 'asc', page = 1, filter ={} } = {}) {
+        const options = {
+            limit: parseInt(limit),
+            page: parseInt(page),
+            sort: { price: sort === 'asc' ? 1 : -1 },
+            lean: true
+        };
 
-            return await productsModel.paginate(
-                {},
-                {
-                    page, 
-                    limit: 5,
-                    lean: true,
-                    sort: {price:1}
-                })
-        }
+        const result = await productsModel.paginate(filter, options);
+        return result;
+    }
     
         static async getProductBy(filtro={}){ 
 
